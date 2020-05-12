@@ -28,3 +28,7 @@ Se quiser fazer alterações, será necessário compilar novamente:
 
     $ gcc -o nomedoarquivo nomedoarquivo.c
 Após, apenas execute o novo arquivo gerado.
+
+## Descrições
+
+A adicionar.
