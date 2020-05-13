@@ -1,6 +1,6 @@
 # Trabalhos de Laboratório de ICC 1
 
-Trabalhos desenvolvidos em C por mim para a disciplina de Laboratório ICC 1 do curso de Ciências de Computação do ICMC/USP.
+Trabalhos desenvolvidos em C por mim para a disciplina de Laboratório de ICC 1 do curso de Ciências de Computação do ICMC/USP.
 
 Link da disciplina no JupiterWeb:
 [https://uspdigital.usp.br/jupiterweb/obterDisciplina?sgldis=SCC0222](https://uspdigital.usp.br/jupiterweb/obterDisciplina?sgldis=SCC0222)
@@ -31,4 +31,5 @@ Após, apenas execute o novo arquivo gerado.
 
 ## Descrições
 
-A adicionar.
+**Bloco 1**: a adicionar
+**Bloco 2**: a adicionar
