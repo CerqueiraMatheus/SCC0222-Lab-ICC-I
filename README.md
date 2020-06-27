@@ -2,8 +2,7 @@
 
 Trabalhos desenvolvidos em C por mim para a disciplina de Laboratório de ICC 1 do curso de Ciências de Computação do ICMC/USP.
 
-Link da disciplina no JupiterWeb:
-[https://uspdigital.usp.br/jupiterweb/obterDisciplina?sgldis=SCC0222](https://uspdigital.usp.br/jupiterweb/obterDisciplina?sgldis=SCC0222)
+[Acesse a disciplina no JupiterWeb](https://uspdigital.usp.br/jupiterweb/obterDisciplina?sgldis=SCC0222).
 
 
 ## Como executar
