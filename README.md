@@ -32,6 +32,6 @@ Após, apenas execute o novo arquivo gerado.
 
 **Bloco 1**: operações básicas e tipos de dados.
 
-**Bloco 2**: matrizes e estruturas de repetiçã.
+**Bloco 2**: matrizes e estruturas de repetição.
 
 **Bloco 3**: ponteiros, structs e alocação dinâmica.
