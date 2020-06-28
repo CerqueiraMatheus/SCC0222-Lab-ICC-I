@@ -8,86 +8,113 @@
 #define MERCURIO "Mercurio"
 #define JUPITER "Jupiter"
 
-//Dia terráqueo em segundos
-#define TERRA_TO_MINUTES (24 * 60)
+//Razão entre o dia terráqueo e dos planetas
+#define VENUS_TO_EARTH 24.0 / (243.0 * 24.0)
+#define MERCURIO_TO_EARTH 24.0 / ((58.0 * 24.0) + 16.0)
+#define JUPITER_TO_EARTH 24.0 / (9.0 + (56.0 / 60.0))
 
-//Razão entre o dia terráqueo e dos planetas em segundos
-#define VENUS_TO_TERRA_MINUTES (TERRA_TO_MINUTES / (243 * 24 * 60))
-#define MERCURIO_TO_TERRA_MINUTES (TERRA_TO_MINUTES / ((58 * 24) + 16) * 60)
-#define JUPITER_TO_TERRA_MINUTES (TERRA_TO_MINUTES / ((9 * 60) + 56))
+//Formato de dados desejado
+#define timeType unsigned long long int
+
+//Buffer para readLine
+#define READLINE_BUFFER 2048
 
 typedef struct {
-    int days;
-    int hours;
-    int minutes;
-    int seconds;
+    timeType days;
+    timeType hours;
+    timeType minutes;
+    timeType seconds;
 } Time;
 
-void readEntry(FILE *stream, int *seconds, char **planet) {
+//Função para ler linha
+char *readLine(FILE *stream) {
+    char *string = 0;
+    int position = 0;
+
+    do {
+        if (position % READLINE_BUFFER == 0) {
+            string =
+                (char *)realloc(string, (position / READLINE_BUFFER + 1) * READLINE_BUFFER);
+        }
+        string[position++] = (char)fgetc(stream);
+    } while (string[position - 1] != ' ' && string[position - 1] != '\n' && !feof(stream));
+
+    string[position - 1] = '\0';
+    string = (char *)realloc(string, position);
+
+    return string;
 }
 
-void convertSecondsToEarthTime(int seconds, char *planet, Time **time) {
+//Converte os segundos para o tempo terráqueo
+void convertSecondsToEarthTime(FILE *stream, timeType *seconds, char **planet, Time **time) {
     //Operadores auxiliares
     double ratio;
     double actualTime;
 
-    //Inicializa a struct temporal
-    (*time) = (Time *)calloc(1, sizeof(Time));
+    (*seconds) = strtoull(readLine(stream), NULL, 10);
+    (*planet) = readLine(stream);
 
     //Escolhe a razão de acordo com o planeta
-    if (planet == TERRA) ratio = 1.0;
-    if (planet == VENUS) ratio = VENUS_TO_TERRA_MINUTES;
-    if (planet == MERCURIO) ratio = MERCURIO_TO_TERRA_MINUTES;
-    if (planet == JUPITER) ratio = JUPITER_TO_TERRA_MINUTES;
+    if (!strcmp((*planet), TERRA)) ratio = 1.0;
+    if (!strcmp((*planet), VENUS)) ratio = VENUS_TO_EARTH;
+    if (!strcmp((*planet), MERCURIO)) ratio = MERCURIO_TO_EARTH;
+    if (!strcmp((*planet), JUPITER)) ratio = JUPITER_TO_EARTH;
 
     //Converte os segundos para
-    //segundos terráqueos
-    actualTime = (seconds / 60) * ratio;
-
-    printf("%lf\n", actualTime);
-
-    //Converte os segundos para dias em float
-    actualTime /= 24;
+    //dias terráqueos
+    actualTime = (((*seconds) * ratio) / 60.0 / 60.0) / 24.0;
 
     //Atribui as informações de tempo
     for (int i = 0; i < 4; i++) {
         switch (i) {
             case 0:
                 (*time)->days = (int)floor(actualTime);
-                printf("DAYS %d\n", (*time)->days);
                 break;
 
             case 1:
                 (*time)->hours = (int)floor(actualTime);
-                printf("HOURS %d\n", (*time)->hours);
                 break;
 
             case 2:
                 (*time)->minutes = (int)floor(actualTime);
-                printf("MINUTES %d\n", (*time)->minutes);
                 break;
 
             case 3:
-                (*time)->seconds = (int)floor(actualTime);
-                printf("SECONDS %d\n", (*time)->seconds);
+                (*time)->seconds = (int)round(actualTime);
                 break;
         }
 
         //Recalcula o tempo atual
-        actualTime -= (int)floor(actualTime);
+        actualTime -= (int)(actualTime);
+
+        //Recalcula o tempo para os dias
+        //ou minutos ou segundos
         if (i == 0)
-            actualTime = actualTime * 24;
+            actualTime *= 24 / ratio;
         else
-            actualTime = actualTime * 60;
+            actualTime *= 60;
     }
 }
 
 int main() {
-    int seconds;
+    timeType seconds;
     char *planet;
-    Time *time = NULL;
 
-    convertSecondsToEarthTime(2, "Terra", &time);
+    //Inicializa a struct temporal
+    Time *time = calloc(1, sizeof(Time));
+
+    //Realiza as operações requisitadas
+    convertSecondsToEarthTime(stdin, &seconds, &planet, &time);
+
+    //Exibe os resultados obtidos
+    printf("%llu segundos no planeta %s equivalem a:\n",
+           seconds, planet);
+    printf("%llu dias, %llu horas, %llu minutos e %llu segundos\n",
+           time->days, time->hours, time->minutes, time->seconds);
+
+    //Libera os ponteiros
+    free(planet);
+    free(time);
 
     return EXIT_SUCCESS;
 }

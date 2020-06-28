@@ -31,76 +31,78 @@ boolean compairStrings(char *s1, char *s2) {
 }
 
 //Lê um grupo de nomes
-void readNames(FILE *stream, char ****names, int *namePosition, int **wordPosition) {
+void readNames(FILE *stream, char ***names) {
     //Operadores de posição
     int namePosition = 0;
-    int wordPosition = 0;
     int charPosition = 0;
 
     //Operadores de controle
     boolean isWord = FALSE;
-    boolean endWord = FALSE;
-    boolean endName = FALSE;
+    boolean endLine = FALSE;
     boolean endFile = FALSE;
+
+    //Aloca as 5 posições previstas
+    (*names) = (char **)calloc(5, sizeof(char *));
 
     //Percorre o arquivo
     do {
-        //Realoca a matriz de nomes
-        (*names) = (char ***)realloc((*names), ((*namePosition) + 1) * sizeof(char **));
+        //Reseta os operadores
+        isWord = FALSE;
+        endLine = FALSE;
+        charPosition = 0;
 
-        //Reseta o operador de nome
-        endName = FALSE;
-
-        //Percorre o nome
+        //Percorre a linha
         do {
-            //Realoca as posições de um nome
-            (*names)[(*namePosition)] =
-                (char **)realloc((*names)[*namePosition],
-                                 ((*wordPosition)[*namePosition] + 1) * sizeof(char *));
+            //Atribui o char
+            char auxChar = fgetc(stdin);
 
-            //Reseta os operadores
-            isWord = FALSE;
-            endWord = FALSE;
-            charPosition = 0;
+            //Verifica se o char é fim de linha
+            if (auxChar == '\n' || auxChar == '\r')
+                endLine = TRUE;
 
-            //Percorre a palavra do nome
-            do {
-                //Atribui o char
-                char auxChar = fgetc(stdin);
+            //Verifica se o char é fim de arquivo
+            else if (auxChar == EOF)
+                endFile = TRUE;
 
-                //Verifica se o char é fim de palavra
-                if (auxChar == ' ')
-                    endWord = TRUE;
+            //Caso for parte de um nome,
+            //seta o operador e atribui
+            else {
+                isWord = TRUE;
 
-                //Verifica se o char é fim de nome
-                else if (auxChar == '\n' || auxChar == '\r')
-                    endName = TRUE;
+                (*names)[(namePosition)] =
+                    (char *)realloc((*names)[namePosition],
+                                    (namePosition + 1) * sizeof(char));
 
-                //Verifica se o char é fim de arquivo
-                else if (auxChar == '$')
-                    endFile = TRUE;
-
-                //Caso for parte de um nome,
-                //seta o operador e atribui
-                else {
-                    isWord = TRUE;
-
-                    (*names)[(*namePosition)][(*wordPosition)[(*namePosition)]] =
-                        (char *)realloc((*names)[(*namePosition)][(*wordPosition)[(*namePosition)]],
-                                        ((*wordPosition)[(*namePosition)] + 1) * sizeof(char));
-
-                    (*names)[(*namePosition)][(*wordPosition)[(*namePosition)]++] = auxChar;
-                }
-            } while (!endWord && !endFile && !endFile);
-            //Se o laço tiver sido executado numa palavra
-            //seta o terminador de string e incrementa
-            //a posição
-            if (isWord) {
-                (*names)[(*namePosition)][(*wordPosition)[(*namePosition)]] = '\0';
-                (*namePosition)++;
+                (*names)[namePosition][charPosition++] = auxChar;
             }
-        } while (!endName && !endFile);
+        } while (!endLine && !endFile);
+
+        //Se o laço tiver sido executado numa palavra
+        //seta o terminador de string e incrementa
+        //a posição
+        if (isWord) {
+            (*names)[namePosition][charPosition] = '\0';
+            namePosition++;
+        }
+
     } while (!endFile);
+}
+
+//Organiza um grupo de nomes
+void sortWordNames(char ***names) {
+    //Percorre os nomes
+    for (int i = 1; i < 5; i++) {
+        for (int j = 5 - 1; j >= i; j--) {
+            //Se o nome anterior for "maior" que o atual
+            if (compairStrings(
+                    (*names)[j - 1],
+                    (*names)[j])) {
+                char *aux = (*names)[j - 1];
+                (*names)[j - 1] = (*names)[j];
+                (*names)[j] = aux;
+            }
+        }
+    }
 }
 
 //Exibe um grupo de nomes
@@ -121,16 +123,15 @@ void freeNames(char ***names) {
 int main() {
     //Matriz de char para
     //nomes
-    char ***names = NULL;
-    int namePosition = 0;
-    int *wordPosition = NULL;
+    char **names = NULL;
 
     //Realiza as operações
-    readNames(stdin, &names, &namePosition, &wordPosition);
-    //printNames(&names);
+    readNames(stdin, &names);
+    sortWordNames(&names);
+    printNames(&names);
 
     //Libera a matriz
-    //freeNames(&names);
+    freeNames(&names);
 
     return EXIT_SUCCESS;
 }
