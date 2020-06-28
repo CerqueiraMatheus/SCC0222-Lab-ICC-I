@@ -30,6 +30,8 @@ Após, apenas execute o novo arquivo gerado.
 
 ## Descrições
 
-**Bloco 1**: a adicionar
+**Bloco 1**: operações básicas e tipos de dados.
 
-**Bloco 2**: a adicionar
+**Bloco 2**: matrizes e estruturas de repetiçã.
+
+**Bloco 3**: ponteiros, structs e alocação dinâmica.
